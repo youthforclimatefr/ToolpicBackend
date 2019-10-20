@@ -2,32 +2,41 @@ const express = require('express');
 const https = require('https');
 const http = require('http');
 const fs = require('fs');
+const rateLimit = require("express-rate-limit");
 
 const app = express();
+
+// Limit requests
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100 // limit each IP to 100 requests per windowMs
+});
+
+//  apply to all requests
+app.use(limiter);
 
 const PORT = 65324;
 
 
-const renderRouter = require(__dirname + '/Render.js');
-
 const emulatorRouter = require(__dirname + '/Emulator.js');
 
+// Set request headers for accessing API from outside
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   next();
 });
 
-app.use('/render', renderRouter);
+// Route to emulator
 app.use('/emulate', emulatorRouter);
 
 const ssl = true;
 
 if (ssl) {
 	const credentials = {
-		key: fs.readFileSync('/etc/letsencrypt/live/render.fridaysforfuture.de/privkey.pem', 'utf8'),
-		cert: fs.readFileSync('/etc/letsencrypt/live/render.fridaysforfuture.de/cert.pem', 'utf8'),
-		ca: fs.readFileSync('/etc/letsencrypt/live/render.fridaysforfuture.de/chain.pem', 'utf8')
+		key: fs.readFileSync('/etc/letsencrypt/live/api.fridaysforfuture.de/privkey.pem', 'utf8'),
+		cert: fs.readFileSync('/etc/letsencrypt/live/api.fridaysforfuture.de/cert.pem', 'utf8'),
+		ca: fs.readFileSync('/etc/letsencrypt/live/api.fridaysforfuture.de/chain.pem', 'utf8')
 	};
 
   https.createServer(credentials, app).listen(PORT);
