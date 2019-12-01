@@ -15,7 +15,11 @@ const limiter = rateLimit({
 //  apply to all requests
 app.use(limiter);
 
-const PORT = 65324;
+const PORT = 443;
+
+app.use(express.static(__dirname + '/public', {
+  dotfiles: 'allow'
+}));
 
 
 const emulatorRouter = require(__dirname + '/Emulator.js');

@@ -22,6 +22,7 @@ const browserPromise = puppeteer.launch({
 
 // Living Toolpic instance whose global scope offers the methods we will execute to render the image
 const instanceRoot = 'https://toolpic.fridaysforfuture.de/__render_api.html';
+//const instanceRoot = 'http://localhost:443/__render_api.html';
 
 // Handle /eulate/format request
 router.post('/:format?', async function(req, res) {
