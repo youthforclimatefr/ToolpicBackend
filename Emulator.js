@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const fs = require('fs');
+const path = require('path');
 const puppeteer = require('puppeteer');
 
 // Parse body up to 10mb
@@ -9,20 +10,34 @@ router.use(bodyParser.json({
   limit: '10mb'
 }));
 
+// Support for pkg
+const executablePath =
+  process.env.PUPPETEER_EXECUTABLE_PATH ||
+  (process.pkg
+    ? path.join(
+        path.dirname(process.execPath),
+        'puppeteer',
+        ...puppeteer
+          .executablePath()
+          .split(path.sep)
+          .slice(6), // /snapshot/project/node_modules/puppeteer/.local-chromium
+      )
+    : puppeteer.executablePath());
+
 // Launch Chromium browser
 const browserPromise = puppeteer.launch({
+  executablePath,
   headless: true,
   args: [
     '--no-sandbox',
     '--disable-setuid-sandbox'
   ],
   ignoreHTTPSErrors: true,
-	dumpio: false
+  dumpio: false
 });
 
 // Living Toolpic instance whose global scope offers the methods we will execute to render the image
-const instanceRoot = 'https://toolpic.fridaysforfuture.de/__render_api.html';
-//const instanceRoot = 'http://localhost:443/__render_api.html';
+const instanceRoot = 'https://toolpic.youthforclimate.fr/__render_api.html';
 
 // Handle /eulate/format request
 router.post('/:format?', async function(req, res) {

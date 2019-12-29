@@ -15,14 +15,14 @@ const limiter = rateLimit({
 //  apply to all requests
 app.use(limiter);
 
-const PORT = 443;
+const PORT = 8081;
 
 app.use(express.static(__dirname + '/public', {
   dotfiles: 'allow'
 }));
 
 
-const emulatorRouter = require(__dirname + '/Emulator.js');
+const emulatorRouter = require('./Emulator.js');
 
 // Set request headers for accessing API from outside
 app.use(function(req, res, next) {
@@ -34,7 +34,7 @@ app.use(function(req, res, next) {
 // Route to emulator
 app.use('/emulate', emulatorRouter);
 
-const ssl = true;
+const ssl = false;
 
 if (ssl) {
 	const credentials = {
